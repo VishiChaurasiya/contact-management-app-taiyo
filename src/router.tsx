@@ -1,5 +1,5 @@
-import Root from "@/pages/Root";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Root from "@/pages/Root";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-const Router: React.FC = () => {
+const Router = () => {
   return <RouterProvider router={router} />;
 };
 

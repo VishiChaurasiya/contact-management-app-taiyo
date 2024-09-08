@@ -1,5 +1,11 @@
-export default function App() {
+import Router from "./router";
+
+const App = () => {
   return (
-    <p className="text-3xl font-bold underline text-green-500">Hello world!</p>
+    <>
+      <Router />
+    </>
   );
-}
+};
+
+export default App;
