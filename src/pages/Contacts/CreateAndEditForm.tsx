@@ -19,12 +19,18 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { Status, addContact } from "@/store/contactSlice";
+import {
+  Contact,
+  Status,
+  addContact,
+  updateContact,
+} from "@/store/contactSlice";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect } from "react";
+import { Nullable } from "@/types/utilityTypes";
 
 const schema = z.object({
   firstName: z
@@ -41,39 +47,77 @@ const schema = z.object({
     errorMap: () => ({ message: "Invalid status" }),
   }),
 });
-
 type FormData = z.infer<typeof schema>;
 
-const AddContacts = () => {
+interface CreateAndEditFormProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedContact?: Nullable<Contact>;
+  setSelectedContact: React.Dispatch<React.SetStateAction<Nullable<Contact>>>;
+}
+
+const DEFAULT_VALUE = {
+  firstName: "",
+  lastName: "",
+  status: Status.Active,
+};
+
+const CreateAndEditForm: React.FC<CreateAndEditFormProps> = ({
+  isOpen,
+  setIsOpen,
+  selectedContact,
+  setSelectedContact,
+}) => {
   const dispatch = useDispatch();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      status: Status.Active,
-    },
+    defaultValues: DEFAULT_VALUE,
   });
-  const [isOpen, setIsOpen] = useState(false);
-
   const { control, handleSubmit, reset } = form;
+  const isNewContact = !selectedContact;
+
+  useEffect(() => {
+    if (selectedContact) reset(selectedContact);
+  }, [selectedContact, reset]);
+
+  const handleOnClose = () => {
+    setSelectedContact(null);
+    reset(DEFAULT_VALUE);
+    setIsOpen(false);
+  };
 
   const onSubmit = async ({ firstName, lastName, status }: FormData) => {
-    dispatch(addContact({ id: Date.now(), firstName, lastName, status }));
-    setIsOpen(false);
-    reset();
+    if (isNewContact)
+      dispatch(addContact({ id: Date.now(), firstName, lastName, status }));
+    else
+      dispatch(
+        updateContact({ id: selectedContact.id, firstName, lastName, status })
+      );
+
+    handleOnClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(isOpen) => {
+        setIsOpen(isOpen);
+
+        if (!isOpen) handleOnClose();
+      }}
+    >
       <DialogTrigger asChild className="self-end">
         <Button onClick={() => setIsOpen(true)}>Add Contact</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create a new contact</DialogTitle>
+          <DialogTitle>
+            {isNewContact ? "Create New Contact" : "Edit Contact"}
+          </DialogTitle>
           <DialogDescription>
-            Add a new contact to the contact list
+            {isNewContact
+              ? "Fill in the details to add a new contact to your list."
+              : "Update the contact information as needed."}
           </DialogDescription>
         </DialogHeader>
 
@@ -134,7 +178,7 @@ const AddContacts = () => {
               )}
             />
 
-            <Button type="submit">Add</Button>
+            <Button type="submit">{isNewContact ? "Add" : "Save"}</Button>
           </form>
         </Form>
       </DialogContent>
@@ -142,4 +186,4 @@ const AddContacts = () => {
   );
 };
 
-export default AddContacts;
+export default CreateAndEditForm;

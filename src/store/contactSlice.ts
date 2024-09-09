@@ -6,7 +6,7 @@ export enum Status {
   Inactive = "inactive",
 }
 
-interface Contact {
+export interface Contact {
   id: number;
   firstName: string;
   lastName: string;
