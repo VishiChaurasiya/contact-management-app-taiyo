@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "@/pages/Root";
 import Contacts from "@/pages/Contacts";
+import ChartsAndMaps from "./pages/ChartsAndMaps";
 
 const router = createBrowserRouter([
   {
@@ -11,18 +12,10 @@ const router = createBrowserRouter([
         path: "",
         element: <Contacts />,
       },
-      // {
-      //   path: "contact",
-      //   element: <ContactPage />,
-      // },
-      // {
-      //   path: "dashboard",
-      //   element: <Dashboard />,
-      // },
-      // {
-      //   path: "*",
-      //   element: <NotFound />, // Handle 404 routes
-      // },
+      {
+        path: "charts-and-maps",
+        element: <ChartsAndMaps />,
+      },
     ],
   },
 ]);
